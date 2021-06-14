@@ -5,6 +5,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
+from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
@@ -117,11 +118,11 @@ app.layout = html.Div(
             children=[
                 # Sankey Diagram
                 html.Div(
-                    id="sankey_diagram",
+                    id="sankey_diagram_div",
                     children=[
                         html.B("Patient Volume"),
                         html.Hr(),
-                        dcc.Graph(id="sankey_diagram_hm", figure=generate_sankey(df=df)),
+                        dcc.Graph(id="sankey_diagram"),  # figure=generate_sankey(df=df)),
                     ],
                 ),
                 # Patient Wait time by Department
@@ -137,6 +138,18 @@ app.layout = html.Div(
         ),
     ],
 )
+
+
+@app.callback(
+    Output("sankey_diagram", "figure"),
+    [
+        Input("age-select", "value"),
+        Input("gender-select", "value"),
+    ],
+)
+def update_heatmap(age, gender):
+    return generate_sankey(df, age, gender)
+
 
 # Run the server
 if __name__ == "__main__":

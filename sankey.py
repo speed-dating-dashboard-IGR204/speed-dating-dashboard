@@ -6,10 +6,10 @@ import plotly.graph_objects as go
 from meta_data import id2race, id2study, id2gender
 
 
-def generate_sankey(df):
+def generate_sankey(df, age, gender):
 
     dfGroupByAge = df.groupby(['age', 'gender'])
-    dfTraget = dfGroupByAge.get_group((27, 0))  # groupé par femme de 27ans
+    dfTraget = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
 
     targetLabelStudy = [id2study[i] for i in dfTraget.groupby('field_cd').size().index]
     targetLabelRace = [id2race[i] for i in dfTraget.groupby('race').size().index]
