@@ -8,34 +8,34 @@ from meta_data import id2race, id2study, id2gender
 
 def generate_sankey(df, age, gender):
 
-    dfGroupByAge = df.groupby(['age', 'gender'])
-    dfTraget = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
+    df_group_by_age = df.groupby(['age', 'gender'])
+    df_target = df_group_by_age.get_group((age, gender))  # groupé par femme de 27ans
 
-    targetLabelStudy = [id2study[i] for i in dfTraget.groupby('field_cd').size().index]
-    targetLabelRace = [id2race[i] for i in dfTraget.groupby('race').size().index]
+    target_label_study = [id2study[i] for i in df_target.groupby('field_cd').size().index]
+    target_label_race = [id2race[i] for i in df_target.groupby('race').size().index]
 
-    labelIndice = targetLabelStudy + targetLabelRace
-    labelIndice.insert(0, 'Cible')
+    label_indice = target_label_study + target_label_race
+    label_indice.insert(0, 'Cible')
 
-    sourceSankey = list(np.zeros(len(targetLabelStudy), dtype=int))
-    targetSankey = [labelIndice.index(i) for i in targetLabelStudy]
+    source_sankey = list(np.zeros(len(target_label_study), dtype=int))
+    target_sankey = [label_indice.index(i) for i in target_label_study]
 
-    for i, j in dfTraget.groupby(['field_cd', 'race']).size().index:
-        sourceSankey.append(labelIndice.index(id2study[i]))
-        targetSankey.append(labelIndice.index(id2race[j]))
+    for i, j in df_target.groupby(['field_cd', 'race']).size().index:
+        source_sankey.append(label_indice.index(id2study[i]))
+        target_sankey.append(label_indice.index(id2race[j]))
 
-    valueSankey = list(dfTraget.groupby('field_cd').size().values) + list(dfTraget.groupby(['field_cd', 'race']).size().values)
+    value_sankey = list(df_target.groupby('field_cd').size().values) + list(df_target.groupby(['field_cd', 'race']).size().values)
 
     return go.Figure(data=[go.Sankey(
         node=dict(
             pad=15,
             thickness=15,
             line=dict(color="blue", width=0.5),
-            label=labelIndice,
+            label=label_indice,
             color="green"
         ),
         link=dict(
-            source=sourceSankey,
-            target=targetSankey,
-            value=valueSankey
+            source=source_sankey,
+            target=target_sankey,
+            value=value_sankey
         ))])
