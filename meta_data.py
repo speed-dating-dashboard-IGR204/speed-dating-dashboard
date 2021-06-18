@@ -43,3 +43,20 @@ id2goal = {
     5: "To say I did it",
     6: "Other"
 }
+
+
+# Need a sort of trivial dictionary that just returns the key it was asked for
+class KeyDict(dict):
+    def __missing__(self, key):
+        return key
+
+
+id2id = KeyDict()
+
+# A dictionary that links the column name with the appropriate conversion dictionary
+id2label_dict = {
+    "field_cd": id2study,
+    "race": id2race,
+    "gender": id2gender,
+    "goal": id2goal
+}
