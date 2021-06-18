@@ -2,6 +2,7 @@
 
 import numpy as np
 import plotly.graph_objects as go
+from functools import reduce
 
 from meta_data import id2race, id2study, id2label_dict, id2id
 
