@@ -1,5 +1,6 @@
 import pathlib
 import datetime
+from sys import stderr,stdout
 
 import dash
 import dash_core_components as dcc
@@ -24,7 +25,6 @@ BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
 df = pd.read_csv(DATA_PATH / "SpeedDating.csv")
-
 
 def description_card():
     """
@@ -60,20 +60,45 @@ def generate_user_card():
             html.P("Select Age"),
             dcc.Dropdown(
                 id="age-select",
-                options=[{"label": i, "value": i} for i in df["age"].dropna().unique()],
+                options=[{"label": i, "value": i} for i in df["age"].sort_values().dropna().unique()],
                 value=min(df["age"].dropna().unique()),
             ),
             html.Br(),
-            html.P("Select Check-In Time"),
-            dcc.DatePickerRange(
-                id="date-picker-select",
-                start_date=datetime.datetime(2014, 1, 1),
-                end_date=datetime.datetime(2014, 1, 15),
-                min_date_allowed=datetime.datetime(2014, 1, 1),
-                max_date_allowed=datetime.datetime(2014, 12, 31),
-                initial_visible_month=datetime.datetime(2014, 1, 1),
+            html.Div(
+                id="religion_div",
+                children=[
+                    html.P("Filter by Religion Importance ?"),
+                    html.Br(),
+                    dcc.RadioItems(
+                        id='check_rel',
+                        options=[
+                            {'label': 'Yes', 'value': 'True'},
+                            {'label': 'No', 'value': 'False'},
+                        ],
+                        value='True',
+                        labelStyle={'display': 'inline-block'}
+                    ),  
+                    html.Br(),
+                    html.Div(
+                        id="religion_slider",
+                        hidden=False,
+                        children=[
+                            html.P("How is religion important for you ?"),
+                            dcc.Slider(
+                                id="imprelig",
+                                min=0,
+                                max=10,
+                                value=5,
+                                marks={
+                                    0: {'label': '0 - Not Important'},
+                                    5: {'label': '5'},
+                                    10: {'label': '10 - Very Important'}
+                                }
+                            )
+                        ]
+                    ), 
+                ]
             ),
-            html.Br(),
             html.Br(),
             html.P("Select "),
             dcc.Dropdown(
@@ -145,10 +170,28 @@ app.layout = html.Div(
     [
         Input("age-select", "value"),
         Input("gender-select", "value"),
+        Input("imprelig", "value")
     ],
 )
-def update_heatmap(age, gender):
-    return generate_sankey(df, age, gender)
+def update_heatmap(age, gender,imprelig):
+    return generate_sankey(df, age, gender,imprelig)
+
+
+""" @app.callback(
+     #Output('click-data', 'children'),
+    Input('basic-interactions', 'clickData'))
+def display_click_data(clickData):
+    pass """
+
+@app.callback(
+    [Output("religion_slider",'hidden'),Output("imprelig", "value")],
+    [Input('check_rel','value')]
+)
+def show_relimp(toggle_value):
+    if toggle_value == 'True':
+        return (False,5)
+    else:
+        return (True,None)
 
 
 # Run the server
