@@ -9,8 +9,9 @@ from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
-from meta_data import id2race, id2study, id2gender
+from meta_data import id2race, id2study, id2gender, id2goal
 from sankey import generate_sankey
+from cleanDf import cleanDF
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
@@ -24,6 +25,7 @@ BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
 df = pd.read_csv(DATA_PATH / "SpeedDating.csv")
+df = cleanDF(df)
 
 
 def description_card():
@@ -64,6 +66,15 @@ def generate_user_card():
                 value=min(df["age"].dropna().unique()),
             ),
             html.Br(),
+            html.Br(),
+            html.P("Select "),
+            dcc.Dropdown(
+                id="gout-target",
+                options=[{"label": i, "value": i} for i in df.columns.dropna().unique()], #à changer plus tard df.columns.dropna().unique()
+                value="a",
+                multi=True,
+            ),
+            html.Br(),
             html.P("Select Check-In Time"),
             dcc.DatePickerRange(
                 id="date-picker-select",
@@ -78,7 +89,7 @@ def generate_user_card():
             html.P("Select "),
             dcc.Dropdown(
                 id="admit-select",
-                options=[{"label": i, "value": i} for i in ["a", "b", "c"]],
+                options=[{"label": i, "value": i} for i in df.columns.dropna().unique()],
                 value="a",
                 multi=True,
             ),

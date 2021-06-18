@@ -34,3 +34,12 @@ id2gender = {
     0: "Female",
     1: "Male"
 }
+
+id2goal = {
+    1: "Seemed like a fun night out",
+    2: "To meet new people",
+    3: "To get a date",
+    4: "Looking for a serious relationship",
+    5: "To say I did it",
+    6: "Other"
+}
