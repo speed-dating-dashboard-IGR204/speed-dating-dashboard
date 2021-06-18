@@ -19,7 +19,7 @@ def income_cat(income):
         return 'very rich'
 
 def cleanDF(df_Speedating):
-    df_Speedating['imprelig']=df_Speedating['imprelig'].apply(lambda x : var_binaire(x))
+    #df_Speedating['imprelig']=df_Speedating['imprelig'].apply(lambda x : var_binaire(x))
     df_Speedating['sports']=df_Speedating['sports'].apply(lambda x : var_binaire(x))
     df_Speedating['tvsports']=df_Speedating['tvsports'].apply(lambda x : var_binaire(x))
     df_Speedating['exercise']=df_Speedating['exercise'].apply(lambda x : var_binaire(x))

@@ -9,13 +9,13 @@ from meta_data import id2race, id2study, id2gender
 def generate_sankey(df, age,gender,imprelig=None):
     if imprelig:
         dfGroupByAge = df.groupby(['age', 'gender','imprelig'])
-        dfTraget = dfGroupByAge.get_group((age, gender,imprelig))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((age, gender,imprelig))  # groupé par femme de 27ans
     else:
         dfGroupByAge = df.groupby(['age', 'gender'])
-        dfTraget = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
         
-    targetLabelStudy = [id2study[i] for i in dfTraget.groupby('field_cd').size().index]
-    targetLabelRace = [id2race[i] for i in dfTraget.groupby('race').size().index]
+    target_label_study = [id2study[i] for i in df_target.groupby('field_cd').size().index]
+    target_label_race = [id2race[i] for i in df_target.groupby('race').size().index]
 
     label_indice = target_label_study + target_label_race
     label_indice.insert(0, 'Cible')
