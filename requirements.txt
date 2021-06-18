@@ -3,3 +3,4 @@ dash-bootstrap-components
 flask
 numpy
 pandas
+plotly
