@@ -1,3 +1,5 @@
+#! /bin/python
+
 import pathlib
 import datetime
 from sys import stderr,stdout
