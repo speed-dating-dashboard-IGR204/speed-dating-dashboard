@@ -7,13 +7,13 @@ from functools import reduce
 from meta_data import id2race, id2study, id2label_dict, id2id
 
 
-def generate_sankey(df,**kwargs):
-    if kwargs['imprelig']:
+def generate_sankey(df,age,gender,imprelig=None):
+    if imprelig:
         dfGroupByAge = df.groupby(['age', 'gender','imprelig'])
-        df_target = dfGroupByAge.get_group((kwargs['age'], kwargs['gender'],kwargs['imprelig']))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((age, gender,imprelig))  # groupé par femme de 27ans
     else:
         dfGroupByAge = df.groupby(['age', 'gender'])
-        df_target = dfGroupByAge.get_group((kwargs['age'], kwargs['gender']))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
         
     target_label_study = [id2study[i] for i in df_target.groupby('field_cd').size().index]
     target_label_race = [id2race[i] for i in df_target.groupby('race').size().index]
