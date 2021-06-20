@@ -7,13 +7,13 @@ from functools import reduce
 from meta_data import id2race, id2study, id2label_dict, id2id
 
 
-def generate_sankey(df, age,gender,imprelig=None):
-    if imprelig:
+def generate_sankey(df,**kwargs):
+    if kwargs['imprelig']:
         dfGroupByAge = df.groupby(['age', 'gender','imprelig'])
-        df_target = dfGroupByAge.get_group((age, gender,imprelig))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((kwargs['age'], kwargs['gender'],kwargs['imprelig']))  # groupé par femme de 27ans
     else:
         dfGroupByAge = df.groupby(['age', 'gender'])
-        df_target = dfGroupByAge.get_group((age, gender))  # groupé par femme de 27ans
+        df_target = dfGroupByAge.get_group((kwargs['age'], kwargs['gender']))  # groupé par femme de 27ans
         
     target_label_study = [id2study[i] for i in df_target.groupby('field_cd').size().index]
     target_label_race = [id2race[i] for i in df_target.groupby('race').size().index]
@@ -30,7 +30,7 @@ def generate_sankey(df, age,gender,imprelig=None):
 
     value_sankey = list(df_target.groupby('field_cd').size().values) + list(df_target.groupby(['field_cd', 'race']).size().values)
 
-    return go.Figure(data=[go.Sankey(
+    return (go.Figure(data=[go.Sankey(
         node=dict(
             pad=15,
             thickness=15,
@@ -42,10 +42,13 @@ def generate_sankey(df, age,gender,imprelig=None):
             source=source_sankey,
             target=target_sankey,
             value=value_sankey
-        ))])
+        ))]),
+
+        go.Figure(data=[go.Histogram(x=df_target['income'])])
+    )
 
 
-def generate_sankey_multi(df, target_dict, criteria_cols):
+def generate_sankey_multi(df,target_dict,criteria_cols):
     """
     Parameters
     ----------

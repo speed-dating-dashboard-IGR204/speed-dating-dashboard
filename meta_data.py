@@ -44,6 +44,8 @@ id2goal = {
     6: "Other"
 }
 
+hobbies = ["sports","tvsports","exercise","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga"]
+
 
 # Need a sort of trivial dictionary that just returns the key it was asked for
 class KeyDict(dict):

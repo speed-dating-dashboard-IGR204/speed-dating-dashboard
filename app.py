@@ -12,7 +12,7 @@ from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
-from meta_data import id2race, id2study, id2gender, id2goal
+from meta_data import id2race, id2study, id2gender, id2goal,hobbies
 from sankey import generate_sankey
 from cleanDf import cleanDF
 
@@ -103,29 +103,29 @@ def generate_user_card():
                     ), 
                 ]
             ),
+            #html.Br(),
+            #html.P("Select "),
+            #dcc.Dropdown(
+            #    id="gout-target",
+            #    options=[{"label": i, "value": i} for i in df.columns.dropna().unique()], #à changer plus tard df.columns.dropna().unique()
+            #    value="a",
+            #    multi=True,
+            #),
+            #html.Br(),
+            #html.P("Select Check-In Time"),
+            #dcc.DatePickerRange(
+            #    id="date-picker-select",
+            #    start_date=datetime.datetime(2014, 1, 1),
+            #    end_date=datetime.datetime(2014, 1, 15),
+            #    min_date_allowed=datetime.datetime(2014, 1, 1),
+            #    max_date_allowed=datetime.datetime(2014, 12, 31),
+            #    initial_visible_month=datetime.datetime(2014, 1, 1),
+            #),
             html.Br(),
-            html.P("Select "),
-            dcc.Dropdown(
-                id="gout-target",
-                options=[{"label": i, "value": i} for i in df.columns.dropna().unique()], #à changer plus tard df.columns.dropna().unique()
-                value="a",
-                multi=True,
-            ),
-            html.Br(),
-            html.P("Select Check-In Time"),
-            dcc.DatePickerRange(
-                id="date-picker-select",
-                start_date=datetime.datetime(2014, 1, 1),
-                end_date=datetime.datetime(2014, 1, 15),
-                min_date_allowed=datetime.datetime(2014, 1, 1),
-                max_date_allowed=datetime.datetime(2014, 12, 31),
-                initial_visible_month=datetime.datetime(2014, 1, 1),
-            ),
-            html.Br(),
-            html.P("Select "),
+            html.P("Select hobbies"),
             dcc.Dropdown(
                 id="admit-select",
-                options=[{"label": i, "value": i} for i in df.columns.dropna().unique()],
+                options=[{"label": i, "value": i} for i in hobbies],
                 value="a",
                 multi=True,
             ),
@@ -172,6 +172,12 @@ app.layout = html.Div(
                         dcc.Graph(id="sankey_diagram"),  # figure=generate_sankey(df=df)),
                     ],
                 ),
+                html.Div(
+                    id="histo_money_div",
+                    children=[
+                        dcc.Graph(id='histo_money')
+                    ]
+                ),
                 # Patient Wait time by Department
                 # html.Div(
                 #     id="wait_time_card",
@@ -188,15 +194,18 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output("sankey_diagram", "figure"),
+    [
+        Output("sankey_diagram", "figure"),
+        Output('histo_money', 'figure')
+    ],
     [
         Input("age-select", "value"),
         Input("gender-select", "value"),
-        Input("imprelig", "value")
+        Input("imprelig", "value"),
     ],
 )
 def update_heatmap(age, gender,imprelig):
-    return generate_sankey(df, age, gender,imprelig)
+    return generate_sankey(df=df, age=age, gender=gender,imprelig=imprelig)
 
 
 """ @app.callback(
@@ -214,7 +223,6 @@ def show_relimp(toggle_value):
         return (False,5)
     else:
         return (True,None)
-
 
 # Run the server
 if __name__ == "__main__":
