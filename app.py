@@ -15,7 +15,7 @@ import pandas as pd
 
 from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age
 from sankey import generate_sankey, generate_sankey_multi
-from cleanDf import cleanDF, get_df_users
+from cleanDf import cleanDF, get_df_users, df_hobbies_creation
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
@@ -34,6 +34,7 @@ df_dates = cleanDF(df_dates)
 
 # User-wise dataframe
 df_users = get_df_users(df_dates)
+df_hobbies = df_hobbies_creation(df_dates)
 
 
 def description_card():
@@ -140,9 +141,9 @@ def generate_user_card():
             html.Br(),
             html.P("Select hobbies"),
             dcc.Dropdown(
-                id="admit-select",
-                options=[{"label": i, "value": i} for i in hobbies],
-                value="a",
+                id="hobbies-select",
+                options=[{"label": i, "value": i} for i in df_hobbies.columns.dropna().unique()],
+                value=min(df_hobbies.columns.dropna().unique()),
                 multi=True,
             ),
             html.Br(),
@@ -232,10 +233,11 @@ app.layout = html.Div(
         Input("age-select", "value"),
         Input("gender-select", "value"),
         Input("race-select", "value"),
+        Input("hobbies-select", "value"),
         # Input("imprelig", "value"),
     ],
 )
-def update_sankey(age, gender, race):
+def update_sankey(age, gender, race, hobbies):
     target_dict = {}
     if age != "Unselected":
         target_dict.update({"age_class": age})
@@ -243,6 +245,10 @@ def update_sankey(age, gender, race):
         target_dict.update({"gender": gender})
     if race != "Unselected":
         target_dict.update({"race": race})
+    if hobbies != "Unselected":
+        if type(hobbies) == list:
+            for hob in hobbies:
+                target_dict.update({str(hob): 1})
     # "imprelig": imprelig
     return generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=["field_cd", "race", "goal"])
 

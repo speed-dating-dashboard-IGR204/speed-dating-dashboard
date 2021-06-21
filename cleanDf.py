@@ -61,3 +61,9 @@ def get_df_users(df_Speedating):
     )
 
     return df_user
+
+def df_hobbies_creation(df_sous_Speed):
+    df_hobbies = df_sous_Speed.drop_duplicates(subset='iid').reset_index(drop=True)[
+        ['sports', 'tvsports', 'exercise', 'dining', 'museums', 'hiking', 'clubbing', 'tv', 'theater', 'movies', 'concerts', 'shopping',
+         'yoga']]
+    return df_hobbies
