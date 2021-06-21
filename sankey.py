@@ -3,6 +3,7 @@
 import numpy as np
 import plotly.graph_objects as go
 from functools import reduce
+import plotly.express as px
 
 from meta_data import id2race, id2study, id2label_dict, id2id
 
@@ -110,16 +111,27 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
             # print(id2label_dict.get(prev_col, id2id)[s], id2label_dict.get(col, id2id)[t], value_sankey[-1])
         prev_col = col
 
+    couleurs = px.colors.qualitative.Plotly\
+               +px.colors.qualitative.D3\
+               +px.colors.qualitative.Dark2\
+               +px.colors.qualitative.Safe\
+               +px.colors.qualitative.Antique\
+               +px.colors.qualitative.Pastel2\
+               +px.colors.qualitative.Set2\
+               +px.colors.qualitative.Prism
+
+    colorNode = couleurs[:len(label_sankey)]
+
     return go.Figure(data=[go.Sankey(
         node=dict(
-            pad=15,
+            pad=10,
             thickness=15,
             line=dict(color="blue", width=0.5),
             label=label_sankey,
-            color="green"
+            color=colorNode
         ),
         link=dict(
             source=source_sankey,
             target=target_sankey,
             value=value_sankey
-        ))])
+        ))]).update_layout(height = 700, font_size=10)
