@@ -2,7 +2,8 @@
 
 import pathlib
 import datetime
-from sys import stderr,stdout
+from sys import stderr, stdout
+from functools import reduce
 
 import dash
 import dash_core_components as dcc
@@ -12,8 +13,8 @@ from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
-from meta_data import id2race, id2study, id2gender, id2goal,hobbies
-from sankey import generate_sankey
+from meta_data import id2race, id2study, id2gender, id2goal, hobbies
+from sankey import generate_sankey, generate_sankey_multi
 from cleanDf import cleanDF
 
 
@@ -29,6 +30,7 @@ DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
 df = pd.read_csv(DATA_PATH / "SpeedDating.csv")
 df = cleanDF(df)
+
 
 def description_card():
     """
@@ -57,15 +59,25 @@ def generate_user_card():
             html.P("Select Gender"),
             dcc.Dropdown(
                 id="gender-select",
-                options=[{"label": id2gender[i], "value": i} for i in df["gender"].dropna().unique()],
-                value=min(df["gender"].dropna().unique()),
+                options=([{"label": "Unselected", "value": "Unselected"}] +
+                         [{"label": id2gender[i], "value": i} for i in df["gender"].dropna().unique()]),
+                value="Unselected",
             ),
             html.Br(),
             html.P("Select Age"),
             dcc.Dropdown(
                 id="age-select",
-                options=[{"label": i, "value": i} for i in df["age"].sort_values().dropna().unique()],
-                value=min(df["age"].dropna().unique()),
+                options=([{"label": "Unselected", "value": "Unselected"}] +
+                         [{"label": i, "value": i} for i in df["age"].sort_values().dropna().unique()]),
+                value="Unselected",
+            ),
+            html.Br(),
+            html.P("Select Ethnicity"),
+            dcc.Dropdown(
+                id="race-select",
+                options=([{"label": "Unselected", "value": "Unselected"}] +
+                         [{"label": id2race[i], "value": i} for i in df["race"].sort_values().dropna().unique()]),
+                value="Unselected",
             ),
             html.Br(),
             html.Div(
@@ -167,9 +179,9 @@ app.layout = html.Div(
                 html.Div(
                     id="sankey_diagram_div",
                     children=[
-                        html.B("Patient Volume"),
+                        # html.B("Patient Volume"),
                         html.Hr(),
-                        dcc.Graph(id="sankey_diagram"),  # figure=generate_sankey(df=df)),
+                        dcc.Graph(id="sankey_diagram",  figure=generate_sankey_multi(df=df, target_dict={"age": 28}, criteria_cols=["field_cd", "race"])),
                     ],
                 ),
                 html.Div(
@@ -191,6 +203,29 @@ app.layout = html.Div(
         ),
     ],
 )
+
+
+@app.callback(
+    # [
+    Output("sankey_diagram", "figure"),
+    # Output('histo_money', 'figure')],
+    [
+        Input("age-select", "value"),
+        Input("gender-select", "value"),
+        Input("race-select", "value"),
+        # Input("imprelig", "value"),
+    ],
+)
+def update_sankey(age, gender, race):
+    target_dict = {}
+    if age != "Unselected":
+        target_dict.update({"age": age})
+    if gender != "Unselected":
+        target_dict.update({"gender": gender})
+    if race != "Unselected":
+        target_dict.update({"race": race})
+    # "imprelig": imprelig
+    return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race"])
 
 
 @app.callback(
