@@ -14,7 +14,7 @@ from dash.dependencies import Input, Output, ClientsideFunction
 import pandas as pd
 
 from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age, id2criterion
-from sankey import generate_sankey, generate_sankey_multi
+from sankey import generate_sankey, generate_sankey_multi, update_histogram
 from cleanDf import cleanDF, get_df_users, df_hobbies_creation
 
 
@@ -205,9 +205,14 @@ app.layout = html.Div(
                     ],
                 ),
                 html.Div(
-                    id="histo_money_div",
+                    id="target_details",
                     children=[
-                        dcc.Graph(id='histo_money')
+                        html.Div(
+                            id="histo_money_div",
+                            children=[
+                                dcc.Graph(id='histo_money')
+                            ]
+                        )
                     ]
                 ),
                 # Patient Wait time by Department
@@ -226,9 +231,10 @@ app.layout = html.Div(
 
 
 @app.callback(
-    # [
+    [
     Output("sankey_diagram", "figure"),
-    # Output('histo_money', 'figure')],
+    Output('histo_money', 'figure')
+    ],
     [
         Input("age-select", "value"),
         Input("gender-select", "value"),
@@ -252,15 +258,8 @@ def update_sankey(age, gender, race, criteria_ids, hobbies):
             for hob in hobbies:
                 target_dict.update({str(hob): 1})
     # "imprelig": imprelig
-    return generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=criteria_cols)
-
-
-""" @app.callback(
-     #Output('click-data', 'children'),
-    Input('basic-interactions', 'clickData'))
-def display_click_data(clickData):
-    pass """
-
+    return (generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=criteria_cols),\
+            update_histogram(df_dates, df_users,target_dict,criteria_cols))
 
 @app.callback(
     [Output("religion_slider",'hidden'),Output("imprelig", "value")],

@@ -122,6 +122,13 @@ H5, H3 {
     vertical-align: middle;
 }
 
+div#target_details{
+    height: 15%;
+}
+
+div#histo_money_div {
+    width: 33.666666667%;
+}
 
 /*
   ##Device = Most of the Smartphones Mobiles / ipad (Portrait)

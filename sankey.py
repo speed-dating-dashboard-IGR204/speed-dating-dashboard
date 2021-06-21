@@ -60,6 +60,14 @@ def make_target_label(target_dict):
 
     return label
 
+def transform_df(df_dates, df_users, target_dict,criteria_cols):
+
+    
+    target_dict.update({"match": 1})  # select matches
+    target_select = reduce(lambda x, y: x.__and__(y), [(df_dates[k] == v) for k, v in target_dict.items()])
+    df_target = df_dates[target_select]
+
+    return df_target
 
 def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     """
@@ -79,16 +87,13 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     -------
     plotly.Graph : the sankey diagram.
     """
+    df_target=transform_df(df_dates, df_users, target_dict, criteria_cols)
     target_label = make_target_label(target_dict)
-    print(target_label)
-    target_dict.update({"match": 1})  # select matches
-    target_select = reduce(lambda x, y: x.__and__(y), [(df_dates[k] == v) for k, v in target_dict.items()])
-    df_target = df_dates[target_select]
 
     # Log the amount of data after each selection
-    print(target_dict, sum(target_select))
+    #print(target_dict, sum(target_select))
     # Join the target dates with the user df on the pid (partner id)
-    print(df_users.columns)
+    #print(df_users.columns)
     df_join = df_target[["iid", "pid"]].merge(df_users[["iid"] + criteria_cols], left_on="pid", right_on="iid")
     #print(df_join.columns, criteria_cols)
 
@@ -155,3 +160,7 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     ],
         layout={"plot_bgcolor": "rgba(0,0,0,0)", "title_text": target_label}
     ).update_layout(height=700, font_size=10)
+
+def update_histogram(df_dates, df_users,target_dict,criteria_cols):
+        df_target=transform_df(df_dates, df_users,target_dict,criteria_cols)
+        return go.Figure(data=[go.Histogram(x=df_target['income'])])
