@@ -48,7 +48,7 @@ def generate_sankey(df,age,gender,imprelig=None):
     )
 
 
-def generate_sankey_multi(df,target_dict,criteria_cols):
+def generate_sankey_multi(df, target_dict, criteria_cols):
     """
     Parameters
     ----------
@@ -67,6 +67,7 @@ def generate_sankey_multi(df,target_dict,criteria_cols):
 
     target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
     df_target = df[target_select]
+    print(target_dict, sum(target_select))
 
     # Build the unique node ids
     node_label2id = {("target", "target"): 0}
