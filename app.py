@@ -13,7 +13,7 @@ from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
-from meta_data import id2race, id2study, id2gender, id2goal, hobbies
+from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age
 from sankey import generate_sankey, generate_sankey_multi
 from cleanDf import cleanDF
 
@@ -68,7 +68,7 @@ def generate_user_card():
             dcc.Dropdown(
                 id="age-select",
                 options=([{"label": "Unselected", "value": "Unselected"}] +
-                         [{"label": i, "value": i} for i in df["age"].sort_values().dropna().unique()]),
+                         [{"label": id2age[i], "value": i} for i in df["age_class"].dropna().unique()]),
                 value="Unselected",
             ),
             html.Br(),
@@ -219,7 +219,7 @@ app.layout = html.Div(
 def update_sankey(age, gender, race):
     target_dict = {}
     if age != "Unselected":
-        target_dict.update({"age": age})
+        target_dict.update({"age_class": age})
     if gender != "Unselected":
         target_dict.update({"gender": gender})
     if race != "Unselected":
