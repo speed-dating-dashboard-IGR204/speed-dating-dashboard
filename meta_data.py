@@ -1,4 +1,9 @@
-
+id2age = {
+    0 : 'below_23',
+    1 : '23_25',
+    2 : '26_28',
+    3 : 'above_29'
+}
 
 id2study = {
     1: 'Law',
@@ -60,5 +65,6 @@ id2label_dict = {
     "field_cd": id2study,
     "race": id2race,
     "gender": id2gender,
-    "goal": id2goal
+    "goal": id2goal,
+    "age_class": id2age
 }

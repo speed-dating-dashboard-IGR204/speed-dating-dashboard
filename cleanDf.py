@@ -45,6 +45,6 @@ def cleanDF(df_Speedating):
     df_Speedating['shopping']=df_Speedating['shopping'].apply(lambda x : var_binaire(x))
     df_Speedating['yoga']=df_Speedating['yoga'].apply(lambda x : var_binaire(x))
     df_Speedating['income']=df_Speedating['income'].apply(lambda x : income_cat(x))
-    df_Speedating['age_classe'] = df_Speedating['age'].apply(lambda x: discretize_age(x))
+    df_Speedating['age_class'] = df_Speedating['age'].apply(lambda x: discretize_age(x))
 
     return df_Speedating
