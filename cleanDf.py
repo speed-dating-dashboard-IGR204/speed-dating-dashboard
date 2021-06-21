@@ -18,6 +18,7 @@ def income_cat(income):
     else:
         return 'very rich'
 
+
 def discretize_age(age):
     """ 4 classe d'age pour echantillon homogène"""
     if age < 23 :
@@ -28,6 +29,7 @@ def discretize_age(age):
         return 2
     else :
         return 3
+
 
 def cleanDF(df_Speedating):
     #df_Speedating['imprelig']=df_Speedating['imprelig'].apply(lambda x : var_binaire(x))
@@ -48,3 +50,14 @@ def cleanDF(df_Speedating):
     df_Speedating['age_class'] = df_Speedating['age'].apply(lambda x: discretize_age(x))
 
     return df_Speedating
+
+
+def get_df_users(df_Speedating):
+    df_user = (
+        df_Speedating[["iid", "age", "field_cd", "race", "goal", "date", "go_out", "career"]]
+        .groupby("iid")
+        .first()
+        .reset_index()
+    )
+
+    return df_user

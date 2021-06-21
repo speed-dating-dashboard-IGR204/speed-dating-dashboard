@@ -48,12 +48,14 @@ def generate_sankey(df,age,gender,imprelig=None):
     )
 
 
-def generate_sankey_multi(df, target_dict, criteria_cols):
+def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     """
     Parameters
     ----------
-    df : pandas.DataFrame
+    df_dates : pandas.DataFrame
         The speed dating data frame.
+    df_users : pandas.DataFrame
+        The data frame with one user per row. 
     target_dict : dict
         The dictionary describing the target user features. Each key, value pair of the dictionary must correspond to an
         existing column name, value pair of the speed dating dataframe.
@@ -64,13 +66,14 @@ def generate_sankey_multi(df, target_dict, criteria_cols):
     -------
     plotly.Graph : the sankey diagram.
     """
-
+    # TODO: select matches
+    # TODO: join with users df to apply criteria selections
     if len(target_dict):
-        target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
-        df_target = df[target_select]
+        target_select = reduce(lambda x, y: x.__and__(y), [(df_dates[k] == v) for k, v in target_dict.items()])
+        df_target = df_dates[target_select]
         print(target_dict, sum(target_select))
     else:
-        df_target = df
+        df_target = df_dates
 
     # Build the unique node ids
     node_label2id = {("target", "target"): 0}

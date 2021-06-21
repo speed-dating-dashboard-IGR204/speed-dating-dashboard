@@ -15,7 +15,7 @@ import pandas as pd
 
 from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age
 from sankey import generate_sankey, generate_sankey_multi
-from cleanDf import cleanDF
+from cleanDf import cleanDF, get_df_users
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
@@ -28,8 +28,12 @@ app.config.suppress_callback_exceptions = True
 BASE_PATH = pathlib.Path(__file__).parent.resolve()
 DATA_PATH = BASE_PATH.joinpath("data").resolve()
 
-df = pd.read_csv(DATA_PATH / "SpeedDating.csv")
-df = cleanDF(df)
+# Get the speed-dating data and process them
+df_dates = pd.read_csv(DATA_PATH / "SpeedDating.csv")
+df_dates = cleanDF(df_dates)
+
+# User-wise dataframe
+df_users = get_df_users(df_dates)
 
 
 def description_card():
@@ -60,7 +64,7 @@ def generate_user_card():
             dcc.Dropdown(
                 id="gender-select",
                 options=([{"label": "Unselected", "value": "Unselected"}] +
-                         [{"label": id2gender[i], "value": i} for i in df["gender"].dropna().unique()]),
+                         [{"label": id2gender[i], "value": i} for i in df_dates["gender"].dropna().unique()]),
                 value="Unselected",
             ),
             html.Br(),
@@ -68,7 +72,7 @@ def generate_user_card():
             dcc.Dropdown(
                 id="age-select",
                 options=([{"label": "Unselected", "value": "Unselected"}] +
-                         [{"label": id2age[i], "value": i} for i in df["age_class"].dropna().unique()]),
+                         [{"label": id2age[i], "value": i} for i in df_dates["age_class"].dropna().unique()]),
                 value="Unselected",
             ),
             html.Br(),
@@ -76,7 +80,7 @@ def generate_user_card():
             dcc.Dropdown(
                 id="race-select",
                 options=([{"label": "Unselected", "value": "Unselected"}] +
-                         [{"label": id2race[i], "value": i} for i in df["race"].sort_values().dropna().unique()]),
+                         [{"label": id2race[i], "value": i} for i in df_dates["race"].sort_values().dropna().unique()]),
                 value="Unselected",
             ),
             html.Br(),
@@ -142,6 +146,14 @@ def generate_user_card():
                 multi=True,
             ),
             html.Br(),
+            html.P("Select criteria"),
+            dcc.Dropdown(
+                id="criteria-select",
+                options=[{"label": i, "value": i} for i in hobbies],
+                value="a",
+                multi=True,
+            ),
+            html.Br(),
             html.Div(
                 id="reset-btn-outer",
                 children=html.Button(id="reset-btn", children="Reset", n_clicks=0),
@@ -181,7 +193,14 @@ app.layout = html.Div(
                     children=[
                         # html.B("Patient Volume"),
                         html.Hr(),
-                        dcc.Graph(id="sankey_diagram",  figure=generate_sankey_multi(df=df, target_dict={"age": 28}, criteria_cols=["field_cd", "race", "goal"])),
+                        dcc.Graph(
+                            id="sankey_diagram",
+                            figure=generate_sankey_multi(
+                                df_dates=df_dates,
+                                df_users=df_users,
+                                target_dict={"age": 28},
+                                criteria_cols=["field_cd", "race", "goal"])
+                        ),
                     ],
                 ),
                 html.Div(
@@ -225,40 +244,7 @@ def update_sankey(age, gender, race):
     if race != "Unselected":
         target_dict.update({"race": race})
     # "imprelig": imprelig
-    return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race", "goal"])
-
-
-# @app.callback(
-#     [
-#         Output("age-select", "options"),
-#         Output("gender-select", "options"),
-#         Output("race-select", "options"),
-#     ],
-#     [
-#         Input("age-select", "value"),
-#         Input("gender-select", "value"),
-#         Input("race-select", "value"),
-#         # Input("imprelig", "value"),
-#     ],
-# )
-# def update_dropdown_options(age, gender, race):
-#     """Dynamically update the dropdown options
-#
-#     The goal is to offer only those options for which some data is present in the data frame"""
-#
-#     target_dict = {}
-#     if age != "Unselected":
-#         target_dict.update({"age": age})
-#     if gender != "Unselected":
-#         target_dict.update({"gender": gender})
-#     if race != "Unselected":
-#         target_dict.update({"race": race})
-#     # "imprelig": imprelig
-#
-#     target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
-#     df_target = df[target_select]
-#
-#     return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race"])
+    return generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=["field_cd", "race", "goal"])
 
 
 """ @app.callback(
@@ -266,6 +252,7 @@ def update_sankey(age, gender, race):
     Input('basic-interactions', 'clickData'))
 def display_click_data(clickData):
     pass """
+
 
 @app.callback(
     [Output("religion_slider",'hidden'),Output("imprelig", "value")],
@@ -276,6 +263,7 @@ def show_relimp(toggle_value):
         return (False,5)
     else:
         return (True,None)
+
 
 # Run the server
 if __name__ == "__main__":
