@@ -54,9 +54,9 @@ def make_target_label(target_dict):
     if "gender" in target_dict:
         label += "Femme\n" if target_dict["gender"] == 0 else "Homme\n"
     if "age_class" in target_dict:
-        label += id2age[target_dict["age_class"]] + "\n"
+        label += " " + id2age[target_dict["age_class"]] + "\n"
     if "race" in target_dict:
-        label += id2race[target_dict["race"]] + "\n"
+        label += " " + id2race[target_dict["race"]] + "\n"
 
     return label
 
@@ -87,11 +87,10 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
 
     # Log the amount of data after each selection
     print(target_dict, sum(target_select))
-
     # Join the target dates with the user df on the pid (partner id)
     print(df_users.columns)
     df_join = df_target[["iid", "pid"]].merge(df_users[["iid"] + criteria_cols], left_on="pid", right_on="iid")
-    print(df_join.columns, criteria_cols)
+    #print(df_join.columns, criteria_cols)
 
     # Build the unique node ids
     node_label2id = {("target", "target"): 0}
@@ -109,7 +108,7 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     col_unique_values = df_group.index.tolist()  # df_target[col].dropna().unique()
     source_sankey = [0] * len(col_unique_values)
     target_sankey = [node_label2id[(col, val)] for val in col_unique_values]
-    label_sankey = [""] + [id2label_dict.get(col, id2id)[val] for val in col_unique_values]
+    label_sankey = [target_label] + [id2label_dict.get(col, id2id)[val] for val in col_unique_values]
     value_sankey = [df_group.loc[c1, "n"] for c1 in col_unique_values]
     # print(label_sankey, value_sankey)
     # Continue the diagram data
