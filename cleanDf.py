@@ -54,7 +54,7 @@ def cleanDF(df_Speedating):
 
 def get_df_users(df_Speedating):
     df_user = (
-        df_Speedating[["iid", "age", "field_cd", "race", "goal", "date", "go_out", "career"]]
+        df_Speedating[["iid", "age_class", "field_cd", "race", "goal", "date", "go_out", "career"]]
         .groupby("iid")
         .first()
         .reset_index()

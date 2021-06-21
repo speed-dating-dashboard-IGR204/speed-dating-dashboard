@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from functools import reduce
 
-from meta_data import id2race, id2study, id2label_dict, id2id
+from meta_data import id2race, id2study, id2label_dict, id2id, id2age
 
 
 def generate_sankey(df,age,gender,imprelig=None):
@@ -48,6 +48,18 @@ def generate_sankey(df,age,gender,imprelig=None):
     )
 
 
+def make_target_label(target_dict):
+    label = ""
+    if "gender" in target_dict:
+        label += "Femme\n" if target_dict["gender"] == 0 else "Homme\n"
+    if "age_class" in target_dict:
+        label += id2age[target_dict["age_class"]] + "\n"
+    if "race" in target_dict:
+        label += id2race[target_dict["race"]] + "\n"
+
+    return label
+
+
 def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     """
     Parameters
@@ -66,20 +78,25 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
     -------
     plotly.Graph : the sankey diagram.
     """
-    # TODO: select matches
-    # TODO: join with users df to apply criteria selections
-    if len(target_dict):
-        target_select = reduce(lambda x, y: x.__and__(y), [(df_dates[k] == v) for k, v in target_dict.items()])
-        df_target = df_dates[target_select]
-        print(target_dict, sum(target_select))
-    else:
-        df_target = df_dates
+    target_label = make_target_label(target_dict)
+    print(target_label)
+    target_dict.update({"match": 1})  # select matches
+    target_select = reduce(lambda x, y: x.__and__(y), [(df_dates[k] == v) for k, v in target_dict.items()])
+    df_target = df_dates[target_select]
+
+    # Log the amount of data after each selection
+    print(target_dict, sum(target_select))
+
+    # Join the target dates with the user df on the pid (partner id)
+    print(df_users.columns)
+    df_join = df_target[["iid", "pid"]].merge(df_users[["iid"] + criteria_cols], left_on="pid", right_on="iid")
+    print(df_join.columns, criteria_cols)
 
     # Build the unique node ids
     node_label2id = {("target", "target"): 0}
     node_id = 1
     for col in criteria_cols:
-        df_group = df_target.groupby([col]).size().to_frame().rename(columns={0: "n"}).sort_values(["n"], ascending=False)
+        df_group = df_join.groupby([col]).size().to_frame().rename(columns={0: "n"}).sort_values(["n"], ascending=False)
         uniques = df_group.index.tolist()
         for val in uniques:
             node_label2id.update({(col, val): node_id})
@@ -87,17 +104,17 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
 
     # Prepare the very first part of the diagram data
     col = criteria_cols[0]
-    df_group = df_target.groupby([col]).size().to_frame().rename(columns={0: "n"}).sort_values(["n"], ascending=False)
+    df_group = df_join.groupby([col]).size().to_frame().rename(columns={0: "n"}).sort_values(["n"], ascending=False)
     col_unique_values = df_group.index.tolist()  # df_target[col].dropna().unique()
     source_sankey = [0] * len(col_unique_values)
     target_sankey = [node_label2id[(col, val)] for val in col_unique_values]
-    label_sankey = ["target"] + [id2label_dict.get(col, id2id)[val] for val in col_unique_values]
+    label_sankey = [""] + [id2label_dict.get(col, id2id)[val] for val in col_unique_values]
     value_sankey = [df_group.loc[c1, "n"] for c1 in col_unique_values]
     # print(label_sankey, value_sankey)
     # Continue the diagram data
     prev_col = col
     for col in criteria_cols[1:]:
-        df_group = df_target.groupby([prev_col, col]).size().to_frame().rename(columns={0: "n"}).sort_values("n", ascending=False)
+        df_group = df_join.groupby([prev_col, col]).size().to_frame().rename(columns={0: "n"}).sort_values("n", ascending=False)
         # prev_col_unique_values = col_unique_values.copy()
         # col_unique_values = df_target[col].dropna().unique()
         for s, t in df_group.index.tolist():
@@ -110,16 +127,21 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
             # print(id2label_dict.get(prev_col, id2id)[s], id2label_dict.get(col, id2id)[t], value_sankey[-1])
         prev_col = col
 
-    return go.Figure(data=[go.Sankey(
-        node=dict(
-            pad=15,
-            thickness=15,
-            line=dict(color="blue", width=0.5),
-            label=label_sankey,
-            color="green"
+    return go.Figure(data=[
+        go.Sankey(
+            node=dict(
+                pad=15,
+                thickness=15,
+                line=dict(color="blue", width=0.5),
+                label=label_sankey,
+                color="green"
+            ),
+            link=dict(
+                source=source_sankey,
+                target=target_sankey,
+                value=value_sankey
+            )
         ),
-        link=dict(
-            source=source_sankey,
-            target=target_sankey,
-            value=value_sankey
-        ))])
+    ],
+        layout={"plot_bgcolor": "rgba(0,0,0,0)", "title_text": target_label}
+    )

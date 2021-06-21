@@ -13,7 +13,7 @@ from dash.dependencies import Input, Output, ClientsideFunction
 
 import pandas as pd
 
-from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age
+from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age, id2criterion
 from sankey import generate_sankey, generate_sankey_multi
 from cleanDf import cleanDF, get_df_users
 
@@ -149,8 +149,8 @@ def generate_user_card():
             html.P("Select criteria"),
             dcc.Dropdown(
                 id="criteria-select",
-                options=[{"label": i, "value": i} for i in hobbies],
-                value="a",
+                options=[{"label": v, "value": k} for k, v in id2criterion.items()],
+                value=[1],
                 multi=True,
             ),
             html.Br(),
@@ -232,11 +232,13 @@ app.layout = html.Div(
         Input("age-select", "value"),
         Input("gender-select", "value"),
         Input("race-select", "value"),
+        Input("criteria-select", "value")
         # Input("imprelig", "value"),
     ],
 )
-def update_sankey(age, gender, race):
+def update_sankey(age, gender, race, criteria_ids):
     target_dict = {}
+    criteria_cols = [id2criterion[i] for i in criteria_ids]
     if age != "Unselected":
         target_dict.update({"age_class": age})
     if gender != "Unselected":
@@ -244,7 +246,7 @@ def update_sankey(age, gender, race):
     if race != "Unselected":
         target_dict.update({"race": race})
     # "imprelig": imprelig
-    return generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=["field_cd", "race", "goal"])
+    return generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=criteria_cols)
 
 
 """ @app.callback(
