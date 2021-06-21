@@ -65,9 +65,12 @@ def generate_sankey_multi(df, target_dict, criteria_cols):
     plotly.Graph : the sankey diagram.
     """
 
-    target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
-    df_target = df[target_select]
-    print(target_dict, sum(target_select))
+    if len(target_dict):
+        target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
+        df_target = df[target_select]
+        print(target_dict, sum(target_select))
+    else:
+        df_target = df
 
     # Build the unique node ids
     node_label2id = {("target", "target"): 0}

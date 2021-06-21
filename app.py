@@ -181,7 +181,7 @@ app.layout = html.Div(
                     children=[
                         # html.B("Patient Volume"),
                         html.Hr(),
-                        dcc.Graph(id="sankey_diagram",  figure=generate_sankey_multi(df=df, target_dict={"age": 28}, criteria_cols=["field_cd", "race"])),
+                        dcc.Graph(id="sankey_diagram",  figure=generate_sankey_multi(df=df, target_dict={"age": 28}, criteria_cols=["field_cd", "race", "goal"])),
                     ],
                 ),
                 html.Div(
@@ -225,22 +225,40 @@ def update_sankey(age, gender, race):
     if race != "Unselected":
         target_dict.update({"race": race})
     # "imprelig": imprelig
-    return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race"])
+    return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race", "goal"])
 
 
-@app.callback(
-    [
-        Output("sankey_diagram", "figure"),
-        Output('histo_money', 'figure')
-    ],
-    [
-        Input("age-select", "value"),
-        Input("gender-select", "value"),
-        Input("imprelig", "value"),
-    ],
-)
-def update_heatmap(age, gender,imprelig):
-    return generate_sankey(df=df, age=age, gender=gender,imprelig=imprelig)
+# @app.callback(
+#     [
+#         Output("age-select", "options"),
+#         Output("gender-select", "options"),
+#         Output("race-select", "options"),
+#     ],
+#     [
+#         Input("age-select", "value"),
+#         Input("gender-select", "value"),
+#         Input("race-select", "value"),
+#         # Input("imprelig", "value"),
+#     ],
+# )
+# def update_dropdown_options(age, gender, race):
+#     """Dynamically update the dropdown options
+#
+#     The goal is to offer only those options for which some data is present in the data frame"""
+#
+#     target_dict = {}
+#     if age != "Unselected":
+#         target_dict.update({"age": age})
+#     if gender != "Unselected":
+#         target_dict.update({"gender": gender})
+#     if race != "Unselected":
+#         target_dict.update({"race": race})
+#     # "imprelig": imprelig
+#
+#     target_select = reduce(lambda x, y: x.__and__(y), [(df[k] == v) for k, v in target_dict.items()])
+#     df_target = df[target_select]
+#
+#     return generate_sankey_multi(df=df, target_dict=target_dict, criteria_cols=["field_cd", "race"])
 
 
 """ @app.callback(
