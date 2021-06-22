@@ -2,8 +2,9 @@
 
 import numpy as np
 import plotly.graph_objects as go
-from functools import reduce
 import plotly.express as px
+from functools import reduce
+
 
 from meta_data import id2race, id2study, id2label_dict, id2id, id2age
 
@@ -163,4 +164,27 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
 
 def update_histogram(df_dates, df_users,target_dict,criteria_cols):
         df_target=transform_df(df_dates, df_users,target_dict,criteria_cols)
-        return go.Figure(data=[go.Histogram(x=df_target['income'])])
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(x=df_target['income'].where(df_target['tuition_bin']==0),
+                                name='No tuition fee',
+                                opacity=0.8
+        ))
+        fig.add_trace(go.Histogram(x=df_target['income'].where(df_target['tuition_bin']==1),
+                                name='Tuition fee',
+                                opacity=0.8
+        ))
+        fig.update_layout(
+            barmode='stack',
+            title_text='Number of Student per Income class', # title of plot
+            xaxis_title_text='Income Class', # xaxis label
+            yaxis_title_text='Number of Student', # yaxis label
+        )
+        return fig
+                                
+                                
+        
+        
+            
+""" go.Histogram(x=df_target['income'],
+                                name='Money Distribution',
+                                opacity=0.8)]) """

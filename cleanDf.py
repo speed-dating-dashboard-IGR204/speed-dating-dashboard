@@ -30,6 +30,11 @@ def discretize_age(age):
     else :
         return 3
 
+def is_tuition(tuition):
+    if tuition >0:
+        return 1
+    else:
+        return 0
 
 def cleanDF(df_Speedating):
     #df_Speedating['imprelig']=df_Speedating['imprelig'].apply(lambda x : var_binaire(x))
@@ -48,6 +53,7 @@ def cleanDF(df_Speedating):
     df_Speedating['yoga']=df_Speedating['yoga'].apply(lambda x : var_binaire(x))
     df_Speedating['income']=df_Speedating['income'].apply(lambda x : income_cat(x))
     df_Speedating['age_class'] = df_Speedating['age'].apply(lambda x: discretize_age(x))
+    df_Speedating['tuition_bin'] = df_Speedating['tuition'].apply(lambda x: is_tuition(float(str(x).replace(',',''))))
 
     return df_Speedating
 
