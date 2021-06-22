@@ -78,8 +78,7 @@ id2criterion = {
     4: "date",
     5: "go_out",
     6: "career",
-    7: "field_cd",
-    8: "career"
+    7: "field_cd"
 }
 
 
