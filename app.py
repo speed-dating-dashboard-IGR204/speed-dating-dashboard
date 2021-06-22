@@ -48,7 +48,7 @@ def description_card():
             html.H3("Welcome to the Speed Dating Analytics Dashboard"),
             html.Div(
                 id="intro",
-                children="Explore the bla bla bla ... .",
+                children="Who do you want to hang out with ?",
             ),
         ],
     )
