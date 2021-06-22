@@ -209,9 +209,9 @@ app.layout = html.Div(
                     ]
                 ),
                 html.Div(
-                    id="histo_money_div",
+                    id="detailed_infos",
                     children=[
-                        html.Div(id="test",children=[dcc.Graph(id='map'),dcc.Graph(id='histo_money')])
+                        dcc.Graph(id='map',className='detailed_graph'),dcc.Graph(id='histo_money',className='detailed_graph')
                     ]
                 )
             ]

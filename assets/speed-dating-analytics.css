@@ -126,8 +126,13 @@ div#target_details{
     height: 15%;
 }
 
-div#histo_money_div {
+#histo_money_div {
     width: 33.666666667%;
+}
+
+.detailed_graph{
+    float:left;
+    width:33.666667%
 }
 
 /*
