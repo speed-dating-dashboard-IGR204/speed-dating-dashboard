@@ -53,6 +53,15 @@ def generate_sankey(df,age,gender,imprelig=None):
     )
 
 
+def partner_target_label(target_dict):
+    label = ""
+    profile = ""
+    if "gender" in target_dict:
+        label += "Female" if target_dict["gender"] == 1 else "Male"
+        profile += "Female" if target_dict["gender"] == 0 else "Male"
+
+    return label, profile
+
 def make_target_label(target_dict):
     label = ""
     if "gender" in target_dict:
@@ -63,6 +72,7 @@ def make_target_label(target_dict):
         label += " " + id2race[target_dict["race"]] + "\n"
 
     return label
+
 
 def transform_df(df_dates, df_users, target_dict,criteria_cols):
 
@@ -162,7 +172,7 @@ def generate_sankey_multi(df_dates, df_users, target_dict, criteria_cols):
             )
         ),
     ],
-        layout={"plot_bgcolor": "rgba(0,0,0,0)", "title_text": target_label}
+        layout={"plot_bgcolor": "rgba(0,0,0,0)", "title_text": target_label, "title_x": 0.5}
     ).update_layout(height=700, font_size=10)
 
 def update_histogram(df_dates, df_users,target_dict,criteria_cols):
@@ -179,6 +189,7 @@ def update_histogram(df_dates, df_users,target_dict,criteria_cols):
         fig.update_layout(
             barmode='stack',
             title_text='Number of Student per Income class', # title of plot
+            title_x=0.5,
             xaxis_title_text='Income Class', # xaxis label
             yaxis_title_text='Number of Student', # yaxis label
             height=secondary_graph_height
@@ -217,6 +228,8 @@ def update_map(df_dates, df_users, target_dict, criteria_cols):
         
 def update_SpiderChart(df_dates, df_users, target_dict, criteria_cols):
     df_target = transform_df(df_dates, df_users, target_dict, criteria_cols)
+    labelLegend, profileLegend = partner_target_label(target_dict)
+
     Mattr = df_target['pf_o_att'].mean()
     Msinc = df_target['pf_o_sin'].mean()
     Mintel = df_target['pf_o_int'].mean()
@@ -224,28 +237,30 @@ def update_SpiderChart(df_dates, df_users, target_dict, criteria_cols):
     Mamb = df_target['pf_o_amb'].mean()
     Mshar = df_target['pf_o_sha'].mean()
 
-    Mattr_o = df_target['attr_o'].mean()
-    Msinc_o = df_target['sinc_o'].mean()
-    Mintel_o = df_target['intel_o'].mean()
-    Mfun_o = df_target['fun_o'].mean()
-    Mamb_o = df_target['amb_o'].mean()
-    Mshar_o = df_target['shar_o'].mean()
+    Mattr_o = df_target['attr1_1'].mean()
+    Msinc_o = df_target['sinc1_1'].mean()
+    Mintel_o = df_target['intel1_1'].mean()
+    Mfun_o = df_target['fun1_1'].mean()
+    Mamb_o = df_target['amb1_1'].mean()
+    Mshar_o = df_target['shar1_1'].mean()
 
     fig = go.Figure(data=go.Scatterpolar(
         r= [Mattr, Msinc, Mintel, Mfun, Mamb, Mshar], #[3, 10, 3, 2, 3, 4],
         theta=['Attractive', 'Sincere', 'Intelligent', 'Fun', 'Ambitious', 'Shared Interests'],
         fill='toself',
-        name='pref'
+        name= labelLegend#'partner'
     ))
 
     fig.add_trace(go.Scatterpolar(
         r=[Mattr_o, Msinc_o, Mintel_o, Mfun_o, Mamb_o, Mshar_o],
         theta=['Attractive', 'Sincere', 'Intelligent', 'Fun', 'Ambitious', 'Shared Interests'],
         fill='toself',
-        name='grades'
+        name= profileLegend
     ))
 
-    fig.update_layout(height=secondary_graph_height)
+    fig.update_layout(title_text='Preference for search of mate',
+                      title_x=0.5,
+                      height=secondary_graph_height)
 
     return fig
             

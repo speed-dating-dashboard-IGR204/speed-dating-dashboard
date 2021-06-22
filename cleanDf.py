@@ -1138,6 +1138,7 @@ def is_tuition(tuition):
     else:
         return 0
 
+
 def cleanDF(df_Speedating):
     #df_Speedating['imprelig']=df_Speedating['imprelig'].apply(lambda x : var_binaire(x))
     df_Speedating['sports']=df_Speedating['sports'].apply(lambda x : var_binaire(x))
@@ -1156,6 +1157,14 @@ def cleanDF(df_Speedating):
     df_Speedating['income']=df_Speedating['income'].apply(lambda x : income_cat(x))
     df_Speedating['age_class'] = df_Speedating['age'].apply(lambda x: discretize_age(x))
     df_Speedating['tuition_bin'] = df_Speedating['tuition'].apply(lambda x: is_tuition(float(str(x).replace(',',''))))
+    df_Speedating['total'] = df_Speedating[['attr_o', 'sinc_o', 'intel_o', 'fun_o', 'amb_o', 'shar_o']].sum(axis=1)
+    df_Speedating['attr_o_100'] = df_Speedating['attr_o'] / df_Speedating['total'] * 100
+    df_Speedating['sinc_o_100'] = df_Speedating['sinc_o'] / df_Speedating['total'] * 100
+    df_Speedating['intel_o_100'] = df_Speedating['intel_o'] / df_Speedating['total'] * 100
+    df_Speedating['fun_o_100'] = df_Speedating['fun_o'] / df_Speedating['total'] * 100
+    df_Speedating['amb_o_100'] = df_Speedating['amb_o'] / df_Speedating['total'] * 100
+    df_Speedating['shar_o_100'] = df_Speedating['shar_o'] / df_Speedating['total'] * 100
+
 
     return df_Speedating
 

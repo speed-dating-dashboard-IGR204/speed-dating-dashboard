@@ -38,8 +38,6 @@ df_dates = cleanDF(df_dates)
 df_users = get_df_users(df_dates)
 df_hobbies = df_hobbies_creation(df_dates)
 
-print('je passe ici')
-
 
 def description_card():
     """
