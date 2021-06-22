@@ -53,7 +53,6 @@ def description_card():
             html.Div(
                 id="intro",
                 children="Who do you want to hang out with ?",
-
             ),
         ],
     )
