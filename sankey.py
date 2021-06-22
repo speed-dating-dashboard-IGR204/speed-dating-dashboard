@@ -9,6 +9,7 @@ from functools import reduce
 from meta_data import id2race, id2study, id2label_dict, id2id, id2age
 import plotly.express as px
 
+secondary_graph_height=400
 
 def generate_sankey(df,age,gender,imprelig=None):
     if imprelig:
@@ -179,7 +180,7 @@ def update_histogram(df_dates, df_users,target_dict,criteria_cols):
             title_text='Number of Student per Income class', # title of plot
             xaxis_title_text='Income Class', # xaxis label
             yaxis_title_text='Number of Student', # yaxis label
-            height=400
+            height=secondary_graph_height
         )
         return fig
 
@@ -190,7 +191,7 @@ def update_map(df_dates, df_users, target_dict, criteria_cols):
 
     fig = px.scatter_mapbox(df_map, lat="lat", lon="lon",
                             # hover_name="City", hover_data=["State", "Population"],color_discrete_sequence=["fuchsia"],
-                            zoom=3, height=400)
+                            zoom=3, height=secondary_graph_height)
     fig.update_layout(mapbox_style="open-street-map")
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
