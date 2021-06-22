@@ -49,6 +49,26 @@ id2goal = {
     6: "Other"
 }
 
+id2date = {
+    1: "Several times a week",
+    2: "Twice a week",
+    3: "Once a week",
+    4: "Twice a month",
+    5: "Once a month",
+    6: "Several times a year",
+    7: "Almost never",
+}
+
+id2goout = {
+    1: "Several times a week",
+    2: "Twice a week",
+    3: "Once a week",
+    4: "Twice a month",
+    5: "Once a month",
+    6: "Several times a year",
+    7: "Almost never",
+}
+
 hobbies = ["sports","tvsports","exercise","dining","museums","art","hiking","gaming","clubbing","reading","tv","theater","movies","concerts","music","shopping","yoga"]
 
 id2criterion = {
@@ -61,6 +81,7 @@ id2criterion = {
     7: "field_cd",
     8: "career"
 }
+
 
 
 # Need a sort of trivial dictionary that just returns the key it was asked for
@@ -77,5 +98,7 @@ id2label_dict = {
     "race": id2race,
     "gender": id2gender,
     "goal": id2goal,
-    "age_class": id2age
+    "age_class": id2age,
+    "date": id2date,
+    "go_out": id2goout
 }
