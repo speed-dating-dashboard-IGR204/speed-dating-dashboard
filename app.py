@@ -14,8 +14,10 @@ from dash.dependencies import Input, Output, ClientsideFunction
 import pandas as pd
 
 from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age, id2criterion
-from sankey import generate_sankey, generate_sankey_multi, update_histogram
+from sankey import generate_sankey, generate_sankey_multi, update_histogram, update_map
 from cleanDf import cleanDF, get_df_users, df_hobbies_creation
+
+import plotly.express as px
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.UNITED])
@@ -36,6 +38,8 @@ df_dates = cleanDF(df_dates)
 df_users = get_df_users(df_dates)
 df_hobbies = df_hobbies_creation(df_dates)
 
+print('je passe ici')
+
 
 def description_card():
     """
@@ -49,6 +53,7 @@ def description_card():
             html.Div(
                 id="intro",
                 children="Who do you want to hang out with ?",
+
             ),
         ],
     )
@@ -201,39 +206,37 @@ app.layout = html.Div(
                                 df_users=df_users,
                                 target_dict={"age": 28},
                                 criteria_cols=["field_cd", "race", "goal"])
-                        ),
-                    ],
-                ),
-                html.Div(
-                    id="target_details",
-                    children=[
-                        html.Div(
-                            id="histo_money_div",
-                            children=[
-                                dcc.Graph(id='histo_money')
-                            ]
                         )
                     ]
                 ),
-                # Patient Wait time by Department
-                # html.Div(
-                #     id="wait_time_card",
-                #     children=[
-                #         html.B("Patient Wait Time and Satisfactory Scores"),
-                #         html.Hr(),
-                #         html.Div(id="wait_time_table", children=initialize_table()),
-                #     ],
-                # ),
-            ],
-        ),
-    ],
+                html.Div(
+                    id="histo_money_div",
+                    children=[
+                        html.Div(id="test",children=[dcc.Graph(id='map'),dcc.Graph(id='histo_money')])
+                    ]
+                )
+            ]
+        )
+    ]
 )
+
+
+# Patient Wait time by Department
+# html.Div(
+#     id="wait_time_card",
+#     children=[
+#         html.B("Patient Wait Time and Satisfactory Scores"),
+#         html.Hr(),
+#         html.Div(id="wait_time_table", children=initialize_table()),
+#     ],
+# ),
 
 
 @app.callback(
     [
     Output("sankey_diagram", "figure"),
-    Output('histo_money', 'figure')
+    Output('histo_money', 'figure'),
+    Output('map', 'figure')
     ],
     [
         Input("age-select", "value"),
@@ -259,7 +262,7 @@ def update_sankey(age, gender, race, criteria_ids, hobbies):
                 target_dict.update({str(hob): 1})
     # "imprelig": imprelig
     return (generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=criteria_cols),\
-            update_histogram(df_dates, df_users,target_dict,criteria_cols))
+            update_histogram(df_dates, df_users,target_dict,criteria_cols), update_map(df_dates, df_users,target_dict,criteria_cols))
 
 @app.callback(
     [Output("religion_slider",'hidden'),Output("imprelig", "value")],

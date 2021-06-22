@@ -7,6 +7,7 @@ from functools import reduce
 
 
 from meta_data import id2race, id2study, id2label_dict, id2id, id2age
+import plotly.express as px
 
 
 def generate_sankey(df,age,gender,imprelig=None):
@@ -180,8 +181,36 @@ def update_histogram(df_dates, df_users,target_dict,criteria_cols):
             yaxis_title_text='Number of Student', # yaxis label
         )
         return fig
-                                
-                                
+
+
+def update_map(df_dates, df_users, target_dict, criteria_cols):
+    df_target = transform_df(df_dates, df_users, target_dict, criteria_cols)
+    df_map = df_users.loc[df_users['iid'].isin(df_target['iid'].unique())]
+
+    fig = px.scatter_mapbox(df_map, lat="lat", lon="lon",
+                            # hover_name="City", hover_data=["State", "Population"],color_discrete_sequence=["fuchsia"],
+                            zoom=3, height=300)
+    fig.update_layout(mapbox_style="open-street-map")
+    fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
+
+
+    #df_target = transform_df(df_dates, df_users, target_dict, criteria_cols)
+    #fig = go.Figure()
+    #fig.add_trace(go.Histogram(x=df_target['income'].where(df_target['tuition_bin'] == 0),
+    #                           name='No tuition fee',
+    #                           opacity=0.8
+    #                           ))
+    #fig.add_trace(go.Histogram(x=df_target['income'].where(df_target['tuition_bin'] == 1),
+    #                           name='Tuition fee',
+    #                           opacity=0.8
+    #                           ))
+    #fig.update_layout(
+    #    barmode='stack',
+    #    title_text='Number of Student per Income class',  # title of plot
+    #    xaxis_title_text='Income Class',  # xaxis label
+    #    yaxis_title_text='Number of Student',  # yaxis label
+    #)
+    return fig
         
         
             
