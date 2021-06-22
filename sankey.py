@@ -10,6 +10,7 @@ from meta_data import id2race, id2study, id2label_dict, id2id, id2age
 import plotly.express as px
 
 secondary_graph_height=400
+#secondary_graph_width=500
 
 def generate_sankey(df,age,gender,imprelig=None):
     if imprelig:
@@ -214,7 +215,39 @@ def update_map(df_dates, df_users, target_dict, criteria_cols):
     #)
     return fig
         
-        
+def update_SpiderChart(df_dates, df_users, target_dict, criteria_cols):
+    df_target = transform_df(df_dates, df_users, target_dict, criteria_cols)
+    Mattr = df_target['pf_o_att'].mean()
+    Msinc = df_target['pf_o_sin'].mean()
+    Mintel = df_target['pf_o_int'].mean()
+    Mfun = df_target['pf_o_fun'].mean()
+    Mamb = df_target['pf_o_amb'].mean()
+    Mshar = df_target['pf_o_sha'].mean()
+
+    Mattr_o = df_target['attr_o'].mean()
+    Msinc_o = df_target['sinc_o'].mean()
+    Mintel_o = df_target['intel_o'].mean()
+    Mfun_o = df_target['fun_o'].mean()
+    Mamb_o = df_target['amb_o'].mean()
+    Mshar_o = df_target['shar_o'].mean()
+
+    fig = go.Figure(data=go.Scatterpolar(
+        r= [Mattr, Msinc, Mintel, Mfun, Mamb, Mshar], #[3, 10, 3, 2, 3, 4],
+        theta=['Attractive', 'Sincere', 'Intelligent', 'Fun', 'Ambitious', 'Shared Interests'],
+        fill='toself',
+        name='pref'
+    ))
+
+    fig.add_trace(go.Scatterpolar(
+        r=[Mattr_o, Msinc_o, Mintel_o, Mfun_o, Mamb_o, Mshar_o],
+        theta=['Attractive', 'Sincere', 'Intelligent', 'Fun', 'Ambitious', 'Shared Interests'],
+        fill='toself',
+        name='grades'
+    ))
+
+    fig.update_layout(height=secondary_graph_height)
+
+    return fig
             
 """ go.Histogram(x=df_target['income'],
                                 name='Money Distribution',
