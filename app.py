@@ -244,10 +244,10 @@ app.layout = html.Div(
         Input("race-select", "value"),
         Input("criteria-select", "value"),
         Input("hobbies-select", "value"),
-        # Input("imprelig", "value"),
+        Input("imprelig", "value"),
     ],
 )
-def update_sankey(age, gender, race, criteria_ids, hobbies):
+def update_sankey(age, gender, race, criteria_ids, hobbies,imprelig=None):
     target_dict = {}
     criteria_cols = [id2criterion[i] for i in criteria_ids]
     if age != "Unselected":
@@ -260,6 +260,8 @@ def update_sankey(age, gender, race, criteria_ids, hobbies):
         if type(hobbies) == list:
             for hob in hobbies:
                 target_dict.update({str(hob): 1})
+    if imprelig:
+        target_dict.update({"imprelig": imprelig})
     # "imprelig": imprelig
     return (generate_sankey_multi(df_dates=df_dates, df_users=df_users, target_dict=target_dict, criteria_cols=criteria_cols),\
             update_histogram(df_dates, df_users,target_dict,criteria_cols), update_map(df_dates, df_users,target_dict,criteria_cols), update_SpiderChart(df_dates, df_users,target_dict,criteria_cols))
