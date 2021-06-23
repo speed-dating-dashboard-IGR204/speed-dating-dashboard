@@ -14,7 +14,7 @@ from dash.dependencies import Input, Output, ClientsideFunction
 import pandas as pd
 
 from meta_data import id2race, id2study, id2gender, id2goal, hobbies, id2age, id2criterion
-from sankey import generate_sankey, generate_sankey_multi, update_histogram, update_map, update_SpiderChart
+from sankey import generate_sankey_multi, update_histogram, update_map, update_SpiderChart
 from cleanDf import cleanDF, get_df_users, df_hobbies_creation
 
 import plotly.express as px
